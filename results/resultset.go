@@ -45,7 +45,7 @@ var skipWords = []string{
 
 // AddResult appends a new Result
 func (rs *ResultSet) AddResult(r *Result) {
-	if r == nil || r.Version[0] == "N/A" {
+	if r == nil {
 		return
 	}
 	for _, part := range r.Version {

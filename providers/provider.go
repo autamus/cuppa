@@ -18,6 +18,7 @@ package providers
 
 import (
 	"github.com/DataDrake/cuppa/providers/cpan"
+	"github.com/DataDrake/cuppa/providers/docker"
 	"github.com/DataDrake/cuppa/providers/git"
 	"github.com/DataDrake/cuppa/providers/github"
 	"github.com/DataDrake/cuppa/providers/gitlab"
@@ -45,6 +46,7 @@ type Provider interface {
 // All returns a list of all available providers
 func All() []Provider {
 	return []Provider{
+		docker.Provider{},
 		cpan.Provider{},
 		github.Provider{},
 		gitlab.Provider{},
