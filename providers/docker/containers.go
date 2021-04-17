@@ -81,7 +81,7 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 			if err != nil {
 				return rs, err
 			}
-			out := results.NewResult(sha.String(), tag, ref.String(), *insp.Created)
+			out := results.NewResult(sha.String(), tag, "docker://"+ref.String(), *insp.Created)
 			if out.Version.String() == "N/A" {
 				out.Version = version.Version{tag}
 			}
