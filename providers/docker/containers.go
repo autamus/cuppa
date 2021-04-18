@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/DataDrake/cuppa/results"
@@ -23,9 +24,13 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 	urlData := strings.SplitN(url, ":", 3)
 	urlNormalized := strings.Join(urlData[:2], ":")
 	// Grab the tag pattern from the end of the string if possible.
+	vexp := regexp.MustCompile(`([0-9]{1,4}[.])+[0-9,a-d]{1,4}`)
 	filter := "*"
 	if len(urlData) > 2 {
 		filter = urlData[2]
+		if vexp.MatchString(filter) {
+			filter = "*.*"
+		}
 	}
 
 	transport := transportFromImageName(urlNormalized)
@@ -44,23 +49,12 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 		return rs, err
 	}
 
-	var latest version.Version
-	if len(tags) > 0 {
-		latest = version.NewVersion(tags[0])
-		for _, tag := range tags {
-			new := version.NewVersion(tag)
-			if latest.Compare(new) > 0 && new.String() != "N/A" {
-				latest = new
-			}
-		}
-	}
-
 	for _, tag := range tags {
 		matched, err := filepath.Match(filter, tag)
 		if err != nil {
 			return rs, err
 		}
-		if matched && (latest.String() == "N/A" || latest.Compare(version.NewVersion(tag)) <= 0) {
+		if matched {
 			ref, err := reference.ParseNormalizedNamed(imgRef.DockerReference().Name() + ":" + tag)
 			if err != nil {
 				return rs, err

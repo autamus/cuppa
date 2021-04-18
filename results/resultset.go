@@ -92,9 +92,14 @@ func (rs *ResultSet) Len() int {
 // index i should sort before the element with index j. (sort.Interface)
 func (rs *ResultSet) Less(i, j int) bool {
 	if !rs.results[i].Published.IsZero() && !rs.results[j].Published.IsZero() {
-		return rs.results[i].Published.Before(rs.results[j].Published)
+		if rs.results[i].Published.Before(rs.results[j].Published) {
+			return true
+		}
+		if rs.results[i].Published.After(rs.results[j].Published) {
+			return false
+		}
 	}
-	return !rs.results[i].Version.Less(rs.results[j].Version)
+	return rs.results[i].Version.Less(rs.results[j].Version)
 }
 
 // Swap swaps the elements with indexes i and j.
