@@ -74,14 +74,15 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 			if err != nil {
 				return rs, err
 			}
-			result.AddResult(
-				results.NewResult(
-					sha.String(),
-					tag,
-					"docker://"+ref.String(),
-					*insp.Created,
-				),
+			output := results.NewResult(
+				sha.String(),
+				tag,
+				"docker://"+ref.String(),
+				*insp.Created,
 			)
+			// Work around CUPPA's default version handling.
+			output.Version = []string{tag}
+			result.AddResult(output)
 		}
 	}
 
