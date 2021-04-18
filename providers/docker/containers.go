@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/DataDrake/cuppa/results"
-	"github.com/DataDrake/cuppa/version"
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/transports"
 	"github.com/containers/image/v5/types"
@@ -75,11 +74,14 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 			if err != nil {
 				return rs, err
 			}
-			out := results.NewResult(sha.String(), tag, "docker://"+ref.String(), *insp.Created)
-			if out.Version.String() == "N/A" {
-				out.Version = version.Version{tag}
-			}
-			result.AddResult(out)
+			result.AddResult(
+				results.NewResult(
+					sha.String(),
+					tag,
+					"docker://"+ref.String(),
+					*insp.Created,
+				),
+			)
 		}
 	}
 

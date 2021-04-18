@@ -101,7 +101,7 @@ func NewVersion(raw string) Version {
 		}
 	}
 	if len(v) == 0 {
-		v = append(v, "N/A")
+		v = append(v, raw)
 	} else {
 		// Strip trailing words
 		i := len(v) - 1
