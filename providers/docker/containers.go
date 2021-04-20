@@ -81,8 +81,11 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 				*insp.Created,
 			)
 			// Work around CUPPA's default version handling.
-			output.Version = []string{tag}
+			if !vexp.MatchString(tag) {
+				output.Version = []string{tag}
+			}
 			result.AddResult(output)
+
 		}
 	}
 
