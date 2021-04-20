@@ -23,7 +23,7 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 	urlData := strings.SplitN(url, ":", 3)
 	urlNormalized := strings.Join(urlData[:2], ":")
 	// Grab the tag pattern from the end of the string if possible.
-	vexp := regexp.MustCompile(`([0-9]{1,4}[.])+[0-9,a-d]{1,4}`)
+	vexp := regexp.MustCompile(`^([0-9]{1,4}[.])+[0-9,a-d]{1,4}$`)
 	filter := "*"
 	if len(urlData) > 2 {
 		filter = urlData[2]
