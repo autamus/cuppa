@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/DataDrake/cuppa/results"
+	"github.com/DataDrake/cuppa/version"
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/transports"
 	"github.com/containers/image/v5/types"
@@ -23,7 +24,8 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 	urlData := strings.SplitN(url, ":", 3)
 	urlNormalized := strings.Join(urlData[:2], ":")
 	// Grab the tag pattern from the end of the string if possible.
-	vexp := regexp.MustCompile(`^([0-9]{1,4}[.])+[0-9,a-d]{1,4}$`)
+	vexp := regexp.MustCompile(`^([0-9]{1,4}[.])+[0-9,a-d]{1,4}`)
+	vexpStrict := regexp.MustCompile(`^([0-9]{1,4}[.])+[0-9,a-d]{1,4}$`)
 	filter := "*"
 	if len(urlData) > 2 {
 		filter = urlData[2]
@@ -46,6 +48,26 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 	tags, err := listDockerTags(ctx, sys, imgRef)
 	if err != nil {
 		return rs, err
+	}
+
+	latest := version.NewVersion("")
+	latestTag := ""
+	for _, tag := range tags {
+		matched, err := filepath.Match(filter, tag)
+		if err != nil {
+			return rs, err
+		}
+		if matched {
+			verString := vexp.FindString(tag)
+			new := version.NewVersion(verString)
+			if latest.String() == "N/A" || (verString != "" && new.Compare(latest) < 0) {
+				latest = new
+				latestTag = tag
+			}
+		}
+	}
+	if latest.String() != "N/A" {
+		filter = latestTag
 	}
 
 	for _, tag := range tags {
@@ -81,7 +103,7 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 				*insp.Created,
 			)
 			// Work around CUPPA's default version handling.
-			if !vexp.MatchString(tag) {
+			if !vexpStrict.MatchString(tag) {
 				output.Version = []string{tag}
 			}
 			result.AddResult(output)
