@@ -29,9 +29,6 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 	filter := "*"
 	if len(urlData) > 2 {
 		filter = urlData[2]
-		if vexp.MatchString(filter) {
-			filter = "*.*"
-		}
 	}
 
 	transport := transportFromImageName(urlNormalized)
@@ -109,6 +106,9 @@ func (c Provider) GetImages(url string) (rs *results.ResultSet, err error) {
 			result.AddResult(output)
 
 		}
+	}
+	if result.Len() < 1 {
+		return nil, results.NotFound
 	}
 
 	return &result, nil
