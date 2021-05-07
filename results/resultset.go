@@ -99,7 +99,7 @@ func (rs *ResultSet) Less(i, j int) bool {
 			return false
 		}
 	}
-	return rs.results[i].Version.Less(rs.results[j].Version)
+	return rs.results[j].Version.Less(rs.results[i].Version)
 }
 
 // Swap swaps the elements with indexes i and j.
